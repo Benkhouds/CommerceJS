@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useState,useEffect } from 'react';
+import {BrowserRouter as Router , Route, Switch} from 'react-router-dom'
+import {Products, Navbar} from './components'
+import {commerce} from './lib/commerce'
 function App() {
+  const [products, setProducts]= useState([])
+  const fetchProducts = async()=>{
+    const {data} = await commerce.products.list()
+     console.log(data)
+    setProducts(data.map(
+      ({id, name, description , media:{source} , price:{formatted_with_symbol}} ) =>(
+        {id, name, description, source,price:formatted_with_symbol}
+      )));
+  } 
+  useEffect(()=>{
+     fetchProducts()
+  },[])
+
+  console.log(products)
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path='/'>
+          {<Navbar/>}
+          <Products products={products}/>
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
